@@ -1,9 +1,9 @@
 import {Client} from '@loopback/testlab';
-import {BackendMongodbApplication} from '../..';
+import {Main} from '../..';
 import {setupApplication} from './test-helper';
 
 describe('HomePage', () => {
-  let app: BackendMongodbApplication;
+  let app: Main;
   let client: Client;
 
   before('setupApplication', async () => {

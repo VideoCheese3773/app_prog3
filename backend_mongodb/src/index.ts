@@ -1,9 +1,9 @@
-import {ApplicationConfig, BackendMongodbApplication} from './application';
+import {ApplicationConfig, Main} from './application';
 
 export * from './application';
 
 export async function main(options: ApplicationConfig = {}) {
-  const app = new BackendMongodbApplication(options);
+  const app = new Main(options);
   await app.boot();
   await app.start();
 

@@ -1,9 +1,9 @@
 import {Client, expect} from '@loopback/testlab';
-import {BackendMongodbApplication} from '../..';
+import {Main} from '../..';
 import {setupApplication} from './test-helper';
 
 describe('PingController', () => {
-  let app: BackendMongodbApplication;
+  let app: Main;
   let client: Client;
 
   before('setupApplication', async () => {
