@@ -5,3 +5,5 @@ Integrantes:
 Eduardo Jose Mejia Alvarez - 
 Dalia Estefany Romero pineda -
 Sebastian Lopez Grajales -
+
+página sobre apuestas y interacción entre usuarios
