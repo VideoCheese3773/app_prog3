@@ -1,4 +1,7 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {Publicacion} from './publicacion.model';
+import {Usuario} from './usuario.model';
+import {Imagen} from './imagen.model';
 
 @model({settings: {strict: false}})
 export class Comentario extends Entity {
@@ -33,6 +36,19 @@ export class Comentario extends Entity {
   })
   fecha: string;
 
+  @property({
+    type: 'string',
+  })
+  id_usuario?: string;
+
+  @belongsTo(() => Publicacion)
+  publicacionId: string;
+
+  @belongsTo(() => Usuario)
+  usuarioId: string;
+
+  @belongsTo(() => Imagen)
+  imagenId: string;
   // Define well-known properties here
 
   // Indexer property to allow additional data
