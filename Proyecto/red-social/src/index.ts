@@ -1,9 +1,9 @@
-import {ApplicationConfig, Main} from './application';
+import {ApplicationConfig, RedSocialApplication} from './application';
 
 export * from './application';
 
 export async function main(options: ApplicationConfig = {}) {
-  const app = new Main(options);
+  const app = new RedSocialApplication(options);
   await app.boot();
   await app.start();
 

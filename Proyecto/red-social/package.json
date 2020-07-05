@@ -1,7 +1,7 @@
 {
-  "name": "proyectob",
+  "name": "red-social",
   "version": "1.0.0",
-  "description": "Plan B de proyecto -- Red Social De Apuestas.",
+  "description": "Proyecto red social de apuestas",
   "keywords": [
     "loopback-application",
     "loopback"
@@ -25,8 +25,8 @@
     "test": "lb-mocha --allow-console-logs \"dist/__tests__\"",
     "posttest": "npm run lint",
     "test:dev": "lb-mocha --allow-console-logs dist/__tests__/**/*.js && npm run posttest",
-    "docker:build": "docker build -t proyectob .",
-    "docker:run": "docker run -p 3000:3000 -d proyectob",
+    "docker:build": "docker build -t red-social .",
+    "docker:run": "docker run -p 3000:3000 -d red-social",
     "migrate": "node ./dist/migrate",
     "openapi-spec": "node ./dist/openapi-spec",
     "prestart": "npm run build",
