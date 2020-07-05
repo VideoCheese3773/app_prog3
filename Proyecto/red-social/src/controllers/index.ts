@@ -1,1 +1,10 @@
+import { start } from 'repl';
 export * from './ping.controller';
+export * from './administrador.controller';
+export * from './publicidad.controller';
+export * from './muro-usuario.controller';
+export * from './muro.controller';
+export * from './publicidad-administrador.controller';
+export * from './muro-usuario.controller';
+export * from './imagen.controller';
+export * from './administrador-usuario.controller';
