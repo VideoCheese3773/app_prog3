@@ -20,3 +20,7 @@ export * from './denuncia-publicacion.controller';
 export * from './comentario-publicacion.controller';
 export * from './comentario-usuario.controller';
 export * from './comentario-imagen.controller';
+export * from './usuario.controller';
+export * from './publicacion.controller';
+export * from './denuncia.controller';
+export * from './comentario.controller';
