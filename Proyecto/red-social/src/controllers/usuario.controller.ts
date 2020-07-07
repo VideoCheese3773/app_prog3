@@ -4,40 +4,74 @@ import {
   Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
-  get,
+  del, get,
   getModelSchemaRef,
-  patch,
+  HttpErrors, param,
+  patch, post,
   put,
-  del,
-  requestBody,
-  HttpErrors,
+  requestBody
 } from '@loopback/rest';
+import {generate} from 'generate-password';
+import {PasswordKeys} from '../keys/password-keys';
+import {ServiceKeys as keys} from '../keys/service-keys';
 import {Usuario} from '../models';
+import {EmailNotification} from '../models/email-notification.model';
 import {UsuarioRepository} from '../repositories';
-import { AuthService } from '../services/auth.service';
+import {AuthService} from '../services/auth.service';
+import {EncryptDecrypt} from '../services/encrypt-decrypt.service';
+import {NotificationService} from '../services/notification.service';
 
 /**
  * El método de restaurar contraseña recibe la clase PasswordResetData,
- * que contiene el nombre de usuario y un tipo de notificación que será 
+ * que contiene el nombre de usuario y un tipo de notificación que será
  * enviada por mensaje de texto y por correo electrónico
  */
 
-class PaswordResetData{
-  username:string;
-  type:number;
+
+class Credentials {
+  username: string;
+  password: string;
+}
+
+
+class PaswordResetData {
+  username: string;
+  type: number;
 }
 
 export class UsuarioController {
   auth: AuthService;
   constructor(
     @repository(UsuarioRepository)
-    public usuarioRepository : UsuarioRepository,
+    public usuarioRepository: UsuarioRepository,
   ) {}
+
+  @post('/login', {
+    responses: {
+      '200': {
+        description: 'Login for users'
+      }
+    }
+  })
+  async login(
+    @requestBody() credentials: Credentials
+  ): Promise<object> {
+    let user = await this.auth.Identify(credentials.username, credentials.password);
+    if (user) {
+      let tk = await this.auth.GenerateToken(user);
+      return {
+        data: user,
+        token: tk
+      }
+    } else {
+      throw new HttpErrors[401]("User or Password invalid.");
+    }
+  }
+
+
 
   @post('/usuarios', {
     responses: {
@@ -60,8 +94,25 @@ export class UsuarioController {
     })
     usuario: Omit<Usuario, 'id_usuario'>,
   ): Promise<Usuario> {
-    
-    return this.usuarioRepository.create(usuario);
+    let s = await this.usuarioRepository.create(usuario);
+    let randomPassword = generate({
+      length: PasswordKeys.LENGTH,
+      numbers: PasswordKeys.NUMBERS,
+      lowercase: PasswordKeys.LOWERCASE,
+      uppercase: PasswordKeys.UPPERCASE
+    });
+    let password1 = new EncryptDecrypt(keys.MD5).Encrypt(randomPassword);
+    let password2 = new EncryptDecrypt(keys.MD5).Encrypt(password1);
+    s.clave = password2
+
+    let notification = new EmailNotification({
+      textBody: `Hola ${s.primer_nombre} ${s.primer_apellido}, Se ha creado una cuenta a su nombre, su usuario es su documento de identidad y su contraseña es: ${randomPassword}`,
+      htmlBody: `Hola ${s.primer_nombre} ${s.primer_apellido}, <br /> Se ha creado una cuenta a su nombre, su usuario es su documento de identidad y su contraseña es: <strong>${randomPassword}</strong>`,
+      to: s.email,
+      subject: 'Nueva Cuenta'
+    });
+    await new NotificationService().MailNotification(notification);
+    return s;
   }
 
   @get('/usuarios/count', {
@@ -195,33 +246,33 @@ export class UsuarioController {
     },
   })
   async reset(
-    @requestBody() passwordResetData:PaswordResetData
+    @requestBody() passwordResetData: PaswordResetData
   ): Promise<object> {
     let randomPassword = this.auth.RecuperarContraseña(passwordResetData.username);
 
-    if(randomPassword){
+    if (randomPassword) {
       //enviar mensaje de texto o correo electrónico con nueva contraseña
       // 1. mensaje de texto
-      // 2. correo electrónico 
-  
+      // 2. correo electrónico
+
       switch (passwordResetData.type) {
         case 1:
           //seleccionó envio por mensaje de texto
-          console.log("enviando mensaje de texto"+ randomPassword);
+          console.log("enviando mensaje de texto" + randomPassword);
           break;
-        
+
         case 2:
           // seleccionó envio por correo electrónico
-          console.log("enviando correo electrónico "+ randomPassword);
+          console.log("enviando correo electrónico " + randomPassword);
           break;
 
         default:
           break;
       }
-   }
+    }
 
-   throw new HttpErrors[400]("User not found");
-     
+    throw new HttpErrors[400]("User not found");
+
   }
 
 
