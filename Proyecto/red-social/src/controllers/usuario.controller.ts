@@ -106,8 +106,8 @@ export class UsuarioController {
     s.clave = password2
 
     let notification = new EmailNotification({
-      textBody: `Hola ${s.primer_nombre} ${s.primer_apellido}, Se ha creado una cuenta a su nombre, su usuario es su documento de identidad y su contraseña es: ${randomPassword}`,
-      htmlBody: `Hola ${s.primer_nombre} ${s.primer_apellido}, <br /> Se ha creado una cuenta a su nombre, su usuario es su documento de identidad y su contraseña es: <strong>${randomPassword}</strong>`,
+      textBody: `Hola ${s.primer_nombre} ${s.primer_apellido}, Se ha creado una cuenta a su nombre, su usuario es su documento de identidad y su contraseña es: ${s.clave}`,
+      htmlBody: `Hola ${s.primer_nombre} ${s.primer_apellido}, <br /> Se ha creado una cuenta a su nombre, su usuario es su documento de identidad y su contraseña es: <strong>${s.clave}</strong>`,
       to: s.email,
       subject: 'Nueva Cuenta'
     });

@@ -45,6 +45,7 @@
     "!*/__tests__"
   ],
   "dependencies": {
+    "@loopback/authentication": "^4.2.9",
     "@loopback/boot": "^2.3.5",
     "@loopback/core": "^2.9.1",
     "@loopback/openapi-v3": "^3.4.5",
@@ -52,7 +53,10 @@
     "@loopback/rest": "^5.2.0",
     "@loopback/rest-explorer": "^2.2.6",
     "@loopback/service-proxy": "^2.3.4",
+    "@types/passport-http": "^0.3.8",
+    "generate-password": "^1.5.1",
     "loopback-connector-mongodb": "^5.2.3",
+    "passport-http": "^0.3.0",
     "tslib": "^2.0.0"
   },
   "devDependencies": {
