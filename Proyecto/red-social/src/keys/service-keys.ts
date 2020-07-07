@@ -1,3 +1,6 @@
+/**
+ * Nombre de diferentes algoritos de la librería crypto-js
+ */
 export namespace ServiceKeys{
     export const MD5='md5';
     export const AES='aes';

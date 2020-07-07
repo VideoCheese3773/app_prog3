@@ -15,11 +15,25 @@ import {
   put,
   del,
   requestBody,
+  HttpErrors,
 } from '@loopback/rest';
 import {Usuario} from '../models';
 import {UsuarioRepository} from '../repositories';
+import { AuthService } from '../services/auth.service';
+
+/**
+ * El método de restaurar contraseña recibe la clase PasswordResetData,
+ * que contiene el nombre de usuario y un tipo de notificación que será 
+ * enviada por mensaje de texto y por correo electrónico
+ */
+
+class PaswordResetData{
+  username:string;
+  type:number;
+}
 
 export class UsuarioController {
+  auth: AuthService;
   constructor(
     @repository(UsuarioRepository)
     public usuarioRepository : UsuarioRepository,
@@ -46,6 +60,7 @@ export class UsuarioController {
     })
     usuario: Omit<Usuario, 'id_usuario'>,
   ): Promise<Usuario> {
+    
     return this.usuarioRepository.create(usuario);
   }
 
@@ -170,4 +185,45 @@ export class UsuarioController {
   async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.usuarioRepository.deleteById(id);
   }
+
+
+  @post('/password-reset', {
+    responses: {
+      '200': {
+        description: 'autenticación para usuarios',
+      },
+    },
+  })
+  async reset(
+    @requestBody() passwordResetData:PaswordResetData
+  ): Promise<object> {
+    let randomPassword = this.auth.RecuperarContraseña(passwordResetData.username);
+
+    if(randomPassword){
+      //enviar mensaje de texto o correo electrónico con nueva contraseña
+      // 1. mensaje de texto
+      // 2. correo electrónico 
+  
+      switch (passwordResetData.type) {
+        case 1:
+          //seleccionó envio por mensaje de texto
+          console.log("enviando mensaje de texto"+ randomPassword);
+          break;
+        
+        case 2:
+          // seleccionó envio por correo electrónico
+          console.log("enviando correo electrónico "+ randomPassword);
+          break;
+
+        default:
+          break;
+      }
+   }
+
+   throw new HttpErrors[400]("User not found");
+     
+  }
+
+
+
 }

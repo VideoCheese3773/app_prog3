@@ -1,5 +1,13 @@
+/**
+ * importación de servicios y entidades para cifrar los datos
+ */
 const CryptoJS=require('crypto-js');
 import {ServiceKeys as keys} from '../keys/service-keys';
+
+/**
+ * La clase usada para encriptar recibe como parámetro un 
+ * texto para su funcionamiento
+ */
 
 export class EncryptDecrypt{
     type: string;
@@ -7,6 +15,10 @@ export class EncryptDecrypt{
         this.type=type;
     }
     
+    /**
+     * diferentes algoritmos para encriptar y desencriptar los datos
+     * @param text 
+     */
     Encrypt(text:string){
         switch (this.type) {
             case keys.MD5:
