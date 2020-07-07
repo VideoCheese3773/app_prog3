@@ -47,7 +47,7 @@ export class UsuarioController {
   constructor(
     @repository(UsuarioRepository)
     public usuarioRepository: UsuarioRepository,
-  ) {}
+  ) {this.auth = new AuthService(usuarioRepository)}
 
   @post('/login', {
     responses: {
@@ -94,16 +94,18 @@ export class UsuarioController {
     })
     usuario: Omit<Usuario, 'id_usuario'>,
   ): Promise<Usuario> {
-    let s = await this.usuarioRepository.create(usuario);
+    
     let randomPassword = generate({
       length: PasswordKeys.LENGTH,
       numbers: PasswordKeys.NUMBERS,
       lowercase: PasswordKeys.LOWERCASE,
       uppercase: PasswordKeys.UPPERCASE
     });
+    console.log(randomPassword)
     let password1 = new EncryptDecrypt(keys.MD5).Encrypt(randomPassword);
     let password2 = new EncryptDecrypt(keys.MD5).Encrypt(password1);
-    s.clave = password2
+    usuario.clave = password2
+    let s = await this.usuarioRepository.create(usuario);
 
     let notification = new EmailNotification({
       textBody: `Hola ${s.primer_nombre} ${s.primer_apellido}, Se ha creado una cuenta a su nombre, su usuario es su documento de identidad y su contraseña es: ${randomPassword}`,
