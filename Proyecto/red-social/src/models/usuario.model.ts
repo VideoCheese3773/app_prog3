@@ -12,7 +12,7 @@ export class Usuario extends Entity {
     generated: true,
   })
   id_usuario?: string;
-  /*EJEMPLO */
+
   @property({
     type: 'string',
     required: true,

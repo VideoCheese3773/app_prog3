@@ -28,10 +28,10 @@ export class AuthService {
    */
   async Identify(username: string, password: string): Promise<Usuario | false> {
     console.log(`Username: ${username} - Password: ${password}`);
-    let user = await this.UsuarioRepository.findOne({where: {username: username}});
+    let user = await this.UsuarioRepository.findOne({where: {nombre_usuario: username}});
     if (user) {
       let cryptPass = new EncryptDecrypt(keys.LOGIN_CRYPT_METHOD).Encrypt(password);
-      if (user.password == cryptPass) {
+      if (user.clave == cryptPass) {
         return user;
       }
     }
@@ -43,14 +43,13 @@ export class AuthService {
    * @param user
    */
   async GenerateToken(user: Usuario) {
-    user.password = '';
+    user.clave = '';
     let token = jwt.sign({
       exp: keys.TOKEN_EXPIRATION_TIME,
       data: {
-        _id: user.id,
-        username: user.username,
-        role: user.role,
-        paternId: user.studentId
+        _id: user.id_usuario,
+        username: user.nombre_usuario,
+        role: user.administradorId,
       }
     },
       keys.JWT_SECRET_KEY);

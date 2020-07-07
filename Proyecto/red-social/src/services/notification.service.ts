@@ -1,6 +1,6 @@
 import {NotificationDatasource} from '../datasources/notification.datasource';
-import {SmsNotification} from '../models';
 import {EmailNotification} from '../models/email-notification.model';
+import {SmsNotification} from '../models/sms-notification.model';
 const twilio = require('twilio');
 const sgMail = require('@sendgrid/mail');
 export class NotificationService {
