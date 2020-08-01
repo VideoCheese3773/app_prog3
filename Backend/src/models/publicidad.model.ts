@@ -1,4 +1,4 @@
-import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {belongsTo, Entity, model, property} from '@loopback/repository';
 import {Administrador} from './administrador.model';
 import {Muro} from './muro.model';
 
@@ -21,6 +21,12 @@ export class Publicidad extends Entity {
     required: true,
   })
   fecha: string;
+
+  @property({
+    type: 'number',
+    required: true,
+  })
+  order: number;
 
   @belongsTo(() => Administrador, {name: 'publicidad'})
   id_administrador: string;

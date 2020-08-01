@@ -25,3 +25,4 @@ export * from './publicacion.controller';
 export * from './denuncia.controller';
 export * from './comentario.controller';
 export * from './imagen-publicacion.controller';
+export * from './carga.controller';

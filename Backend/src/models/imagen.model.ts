@@ -1,4 +1,4 @@
-import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {belongsTo, Entity, model, property} from '@loopback/repository';
 import {Publicacion} from './publicacion.model';
 
 @model()
@@ -25,6 +25,12 @@ export class Imagen extends Entity {
     type: 'string',
   })
   titulo?: string;
+
+  @property({
+    type: 'number',
+    required: true,
+  })
+  order: number;
 
   @belongsTo(() => Publicacion, {name: 'imagen'})
   id_publicacion: string;
