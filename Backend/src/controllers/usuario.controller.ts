@@ -110,7 +110,7 @@ export class UsuarioController {
     let notification = new EmailNotification({
       textBody: `Hola ${s.primer_nombre} ${s.primer_apellido}, Se ha creado una cuenta a su nombre en la version experimental de la red social de apuestas BETWHERE, su usuario es su documento de identidad y su contraseña es: ${randomPassword}`,
       htmlBody: `Hola ${s.primer_nombre} ${s.primer_apellido}, <br /> Se ha creado una cuenta a su nombre en la version experimental de la red social de apuestas BETWHERE, su usuario es su documento de identidad y su contraseña es: <strong>${randomPassword}</strong>`,
-      to: s.email,
+      to: s.correo,
       subject: 'Nueva Cuenta --> BETWHERE'
     });
     await new NotificationService().MailNotification(notification);

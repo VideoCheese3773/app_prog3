@@ -36,16 +36,15 @@ export class Usuario extends Entity {
   segundo_apellido?: string;
 
   @property({
-    type: 'number',
-    required: true,
-  })
-  rol: number;
-
-  @property({
     type: 'string',
     required: true,
   })
   nombre_usuario: string;
+
+  @property({
+    type: 'number',
+  })
+  rol?: number;
 
   @property({
     type: 'string',
@@ -68,19 +67,18 @@ export class Usuario extends Entity {
     type: 'number',
     required: true,
   })
-  celular: number;
+  celular: String;
 
   @property({
-    type: 'date',
+    type: 'String',
     required: true,
   })
   nacimiento: string;
 
   @property({
     type: 'string',
-    required: true,
   })
-  foto: string;
+  foto?: string;
 
   @property({
     type: 'string',
@@ -98,11 +96,6 @@ export class Usuario extends Entity {
 
   @belongsTo(() => Muro)
   muroId: string;
-  // Define well-known properties here
-
-  // Indexer property to allow additional data
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [prop: string]: any;
 
   constructor(data?: Partial<Usuario>) {
     super(data);
