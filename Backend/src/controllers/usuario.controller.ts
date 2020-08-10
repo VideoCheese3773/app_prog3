@@ -19,7 +19,7 @@ import {PasswordKeys} from '../keys/password-keys';
 import {ServiceKeys as keys} from '../keys/service-keys';
 import {Usuario} from '../models';
 import {EmailNotification} from '../models/email-notification.model';
-import {UsuarioRepository} from '../repositories';
+import {AdministradorRepository, UsuarioRepository} from '../repositories';
 import {AuthService} from '../services/auth.service';
 import {EncryptDecrypt} from '../services/encrypt-decrypt.service';
 import {NotificationService} from '../services/notification.service';
@@ -32,8 +32,8 @@ import {NotificationService} from '../services/notification.service';
 
 
 class Credentials {
-  username: string;
-  password: string;
+  nombre_usuario: string;
+  clave: string;
 }
 
 
@@ -47,9 +47,11 @@ export class UsuarioController {
   constructor(
     @repository(UsuarioRepository)
     public usuarioRepository: UsuarioRepository,
-  ) {this.auth = new AuthService(usuarioRepository)}
+    @repository(AdministradorRepository)
+    public administradorRepository: AdministradorRepository,
+  ) {this.auth = new AuthService(usuarioRepository, administradorRepository)}
 
-  @post('/login', {
+  @post('/login-usuario', {
     responses: {
       '200': {
         description: 'Login for users'
@@ -59,11 +61,11 @@ export class UsuarioController {
   async login(
     @requestBody() credentials: Credentials
   ): Promise<object> {
-    let user = await this.auth.Identify(credentials.username, credentials.password);
-    if (user) {
-      let tk = await this.auth.GenerateToken(user);
+    let usuario = await this.auth.Identify(credentials.nombre_usuario, credentials.clave);
+    if (usuario) {
+      let tk = await this.auth.GenerateToken(usuario);
       return {
-        data: user,
+        data: usuario,
         token: tk
       }
     } else {
@@ -108,8 +110,8 @@ export class UsuarioController {
     let s = await this.usuarioRepository.create(usuario);
 
     let notification = new EmailNotification({
-      textBody: `Hola ${s.primer_nombre} ${s.primer_apellido}, Se ha creado una cuenta a su nombre en la version experimental de la red social de apuestas BETWHERE, su usuario es su documento de identidad y su contraseña es: ${randomPassword}`,
-      htmlBody: `Hola ${s.primer_nombre} ${s.primer_apellido}, <br /> Se ha creado una cuenta a su nombre en la version experimental de la red social de apuestas BETWHERE, su usuario es su documento de identidad y su contraseña es: <strong>${randomPassword}</strong>`,
+      textBody: `Hola ${s.primer_nombre} ${s.primer_apellido}, Se ha creado una cuenta a su nombre en la version experimental de la red social de apuestas BETWHERE, su usuario es ${s.nombre_usuario} y su contraseña es: ${randomPassword}`,
+      htmlBody: `Hola ${s.primer_nombre} ${s.primer_apellido}, <br /> Se ha creado una cuenta a su nombre en la version experimental de la red social de apuestas BETWHERE, su usuario es ${s.nombre_usuario} y su contraseña es: <strong>${randomPassword}</strong>`,
       to: s.correo,
       subject: 'Nueva Cuenta --> BETWHERE'
     });

@@ -1,4 +1,4 @@
-import {Entity, model, property, hasMany, belongsTo} from '@loopback/repository';
+import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
 import {Publicidad} from './publicidad.model';
 import {Usuario} from './usuario.model';
 
@@ -9,12 +9,25 @@ export class Administrador extends Entity {
     required: true,
   })
   rol: number;
+
   @property({
     type: 'string',
     id: true,
     generated: true,
   })
   id_administrador?: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  clave: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  correo: string;
 
   @hasMany(() => Publicidad, {keyTo: 'id_administrador'})
   publicidades: Publicidad[];

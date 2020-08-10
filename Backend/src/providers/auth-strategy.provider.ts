@@ -7,7 +7,7 @@ import {repository} from '@loopback/repository';
 import {Strategy} from 'passport';
 import {BasicStrategy} from 'passport-http';
 import {Strategy as BearerStrategy} from 'passport-http-bearer';
-import {UsuarioRepository} from '../repositories';
+import {AdministradorRepository, UsuarioRepository} from '../repositories';
 import {AuthService} from '../services/auth.service';
 
 export class MyAuthStrategyProvider implements Provider<Strategy | undefined> {
@@ -16,10 +16,12 @@ export class MyAuthStrategyProvider implements Provider<Strategy | undefined> {
   constructor(
     @inject(AuthenticationBindings.METADATA)
     private metadata: AuthenticationMetadata,
+    @repository(AdministradorRepository)
+    public AdminRepository: AdministradorRepository,
     @repository(UsuarioRepository)
     public userRepository: UsuarioRepository
   ) {
-    this.authService = new AuthService(userRepository);
+    this.authService = new AuthService(userRepository, AdminRepository);
   }
 
   value(): ValueOrPromise<Strategy | undefined> {

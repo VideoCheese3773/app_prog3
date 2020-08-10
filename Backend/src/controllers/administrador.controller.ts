@@ -4,26 +4,73 @@ import {
   Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
-  get,
+  del, get,
   getModelSchemaRef,
-  patch,
+
+
+
+
+  HttpErrors, param,
+
+
+  patch, post,
+
+
+
+
   put,
-  del,
-  requestBody,
+
+  requestBody
 } from '@loopback/rest';
+import {generate} from 'generate-password';
+import {PasswordKeys} from '../keys/password-keys';
+import {ServiceKeys as keys} from '../keys/service-keys';
 import {Administrador} from '../models';
-import {AdministradorRepository} from '../repositories';
+import {EmailNotification} from '../models/email-notification.model';
+import {AdministradorRepository, UsuarioRepository} from '../repositories';
+import {AuthService} from '../services/auth.service';
+import {EncryptDecrypt} from '../services/encrypt-decrypt.service';
+import {NotificationService} from '../services/notification.service';
+
+class Credentials {
+  correo: string;
+  clave: string;
+}
 
 export class AdministradorController {
+  auth: AuthService;
   constructor(
     @repository(AdministradorRepository)
-    public administradorRepository : AdministradorRepository,
-  ) {}
+    public usuarioRepository: UsuarioRepository,
+    public administradorRepository: AdministradorRepository,
+  ) {this.auth = new AuthService(usuarioRepository, administradorRepository)}
+
+  @post('/login-admin', {
+    responses: {
+      '200': {
+        description: 'Login for admin'
+      }
+    }
+  })
+  async login(
+    @requestBody() credentials: Credentials
+  ): Promise<object> {
+    let admin = await this.auth.Identifyadmin(credentials.correo, credentials.clave);
+    if (admin) {
+      let tk = await this.auth.GenerateTokenadmin(admin);
+      return {
+        data: admin,
+        token: tk
+      }
+    } else {
+      throw new HttpErrors[401]("admin or Password invalid.");
+    }
+  }
+
+
 
   @post('/administradores', {
     responses: {
@@ -38,7 +85,7 @@ export class AdministradorController {
       content: {
         'application/json': {
           schema: getModelSchemaRef(Administrador, {
-            title: 'NewAdministrador',
+            title: 'newadmin',
             exclude: ['id_administrador'],
           }),
         },
@@ -46,7 +93,27 @@ export class AdministradorController {
     })
     administrador: Omit<Administrador, 'id_administrador'>,
   ): Promise<Administrador> {
-    return this.administradorRepository.create(administrador);
+
+    let randomPassword = generate({
+      length: PasswordKeys.LENGTH,
+      numbers: PasswordKeys.NUMBERS,
+      lowercase: PasswordKeys.LOWERCASE,
+      uppercase: PasswordKeys.UPPERCASE
+    });
+    console.log(randomPassword)
+    let password1 = new EncryptDecrypt(keys.MD5).Encrypt(randomPassword);
+    let password2 = new EncryptDecrypt(keys.MD5).Encrypt(password1);
+    administrador.clave = password2
+    let a = await this.administradorRepository.create(administrador);
+
+    let notification = new EmailNotification({
+      textBody: `Hola , Se ha creado una cuenta ADMINISTRADOR a su nombre en la version experimental de la red social de apuestas BETWHERE, su usuario es ${a.correo} y su contraseña es: ${randomPassword}`,
+      htmlBody: `Hola , <br /> Se ha creado una cuenta a su nombre en la version experimental de la red social de apuestas BETWHERE, su usuario es ${a.correo} y su contraseña es: <strong>${randomPassword}</strong>`,
+      to: a.correo,
+      subject: 'Nueva Cuenta --> BETWHERE'
+    });
+    await new NotificationService().MailNotification(notification);
+    return a;
   }
 
   @get('/administradores/count', {

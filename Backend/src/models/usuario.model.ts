@@ -64,13 +64,13 @@ export class Usuario extends Entity {
   ciudad: string;
 
   @property({
-    type: 'number',
+    type: 'string',
     required: true,
   })
-  celular: String;
+  celular: string;
 
   @property({
-    type: 'String',
+    type: 'string',
     required: true,
   })
   nacimiento: string;
