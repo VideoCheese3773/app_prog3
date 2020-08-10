@@ -9,20 +9,9 @@ import {
 import {
   del, get,
   getModelSchemaRef,
-
-
-
-
   HttpErrors, param,
-
-
   patch, post,
-
-
-
-
   put,
-
   requestBody
 } from '@loopback/rest';
 import {generate} from 'generate-password';
@@ -44,8 +33,9 @@ export class AdministradorController {
   auth: AuthService;
   constructor(
     @repository(AdministradorRepository)
-    public usuarioRepository: UsuarioRepository,
     public administradorRepository: AdministradorRepository,
+    @repository(UsuarioRepository)
+    public usuarioRepository: UsuarioRepository
   ) {this.auth = new AuthService(usuarioRepository, administradorRepository)}
 
   @post('/login-admin', {

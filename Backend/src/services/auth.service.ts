@@ -52,6 +52,40 @@ export class AuthService {
     }
     return false;
   }
+  /**
+   * Verify if cureent password belongs to user
+   * @param id id of user to verify
+   * @param clave current password
+   */
+  async VerifyUserToChangePassword(id: string, clave: string): Promise<Usuario | false> {
+    console.log(`Username: ${id} - Password: ${clave}`);
+    let user = await this.UsuarioRepository.findById(id);
+    if (user) {
+      let cryptPass = new EncryptDecrypt(keys.LOGIN_CRYPT_METHOD).Encrypt(clave);
+      if (user.clave == cryptPass) {
+        return user;
+      }
+    }
+    return false;
+  }
+
+  /**
+   *
+   * @param id user id to update passowrd
+   * @param clave new password
+   */
+  async ChangePassword(id: string, clave: string): Promise<Boolean> {
+    //console.log(`Username: ${username} - Password: ${password}`);
+    let user = await this.UsuarioRepository.findById(id);
+    if (user) {
+      let cryptPass = new EncryptDecrypt(keys.LOGIN_CRYPT_METHOD).Encrypt(clave);
+      let cryptPass2 = new EncryptDecrypt(keys.LOGIN_CRYPT_METHOD).Encrypt(cryptPass);
+      user.clave = cryptPass2;
+      await this.UsuarioRepository.updateById(id, user);
+      return true;
+    }
+    return false;
+  }
 
   /**
    *
@@ -101,23 +135,25 @@ export class AuthService {
     }
   }
 
-  async RecuperarContraseña(username: string): Promise<string | false> {
-    let usuario = await this.UsuarioRepository.findOne({where: {correo: username}});
-    if (usuario) {
+  /**
+   * Reset the user password when it is missed
+   * @param username
+   */
+  async ResetPassword(nombre_usuario: string): Promise<string | false> {
+    let user = await this.UsuarioRepository.findOne({where: {nombre_usuario: nombre_usuario}});
+    if (user) {
       let randomPassword = generator({
         length: passKeys.LENGTH,
         numbers: passKeys.NUMBERS,
         lowercase: passKeys.LOWERCASE,
         uppercase: passKeys.UPPERCASE
-
       });
-      let crypter = new EncryptDecrypt('asifhufehu');
+      let crypter = new EncryptDecrypt(keys.LOGIN_CRYPT_METHOD);
       let password = crypter.Encrypt(crypter.Encrypt(randomPassword));
-      usuario.clave = password;
-      this.UsuarioRepository.replaceById(usuario.id_usuario, usuario);
+      user.clave = password;
+      this.UsuarioRepository.replaceById(user.id_usuario, user);
       return randomPassword;
     }
-
     return false;
   }
 

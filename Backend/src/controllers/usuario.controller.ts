@@ -19,6 +19,7 @@ import {PasswordKeys} from '../keys/password-keys';
 import {ServiceKeys as keys} from '../keys/service-keys';
 import {Usuario} from '../models';
 import {EmailNotification} from '../models/email-notification.model';
+import {SmsNotification} from '../models/sms-notification.model';
 import {AdministradorRepository, UsuarioRepository} from '../repositories';
 import {AuthService} from '../services/auth.service';
 import {EncryptDecrypt} from '../services/encrypt-decrypt.service';
@@ -30,16 +31,20 @@ import {NotificationService} from '../services/notification.service';
  * enviada por mensaje de texto y por correo electrónico
  */
 
-
+class ChangePasswordData {
+  id: string;
+  clave_actual: string;
+  clave_nueva: string;
+}
 class Credentials {
   nombre_usuario: string;
   clave: string;
 }
 
 
-class PaswordResetData {
-  username: string;
-  type: number;
+class PasswordResetData {
+  nombre_usuario: string;
+  tipo: number;
 }
 
 export class UsuarioController {
@@ -245,40 +250,83 @@ export class UsuarioController {
   @post('/password-reset', {
     responses: {
       '200': {
-        description: 'autenticación para usuarios',
-      },
-    },
+        description: 'Login for users'
+      }
+    }
   })
   async reset(
-    @requestBody() passwordResetData: PaswordResetData
-  ): Promise<object> {
-    let randomPassword = this.auth.RecuperarContraseña(passwordResetData.username);
+    @requestBody() passwordResetData: PasswordResetData
+  ): Promise<boolean> {
+    let randomPassword = await this.auth.ResetPassword(passwordResetData.nombre_usuario);
 
     if (randomPassword) {
-      //enviar mensaje de texto o correo electrónico con nueva contraseña
-      // 1. mensaje de texto
-      // 2. correo electrónico
-
-      switch (passwordResetData.type) {
+      // send sms or mail with new password
+      // 1. SMS
+      // 2. Mail
+      // ....
+      let usuario = await this.usuarioRepository.findOne({where: {nombre_usuario: passwordResetData.nombre_usuario}})
+      switch (passwordResetData.tipo) {
         case 1:
-          //seleccionó envio por mensaje de texto
-          console.log("enviando mensaje de texto" + randomPassword);
-          break;
+          if (usuario) {
+            console.log("a");
+            let notification = new SmsNotification({
+              body: `Su nueva contraseña es: ${randomPassword}`,
+              to: usuario.celular
+            });
+            let sms = await new NotificationService().SmsNotification(notification);
+            if (sms) {
+              console.log("sms message sent");
+              return true
+            }
+            throw new HttpErrors[400]("Phone is not found");
+          }
+          throw new HttpErrors[400]("user not found");
 
+          break;
         case 2:
-          // seleccionó envio por correo electrónico
-          console.log("enviando correo electrónico " + randomPassword);
+          // send mail
+          if (usuario) {
+            let notification = new EmailNotification({
+              textBody: `Su nueva contraseña es: ${randomPassword}`,
+              htmlBody: `Su nueva contraseña es: ${randomPassword}`,
+              to: usuario.correo,
+              subject: 'Nueva contraseña'
+            });
+            let mail = await new NotificationService().MailNotification(notification);
+            if (mail) {
+              console.log("mail message sent");
+              return true
+            }
+            throw new HttpErrors[400]("Email is not found");
+          }
+          throw new HttpErrors[400]("User not found");
           break;
 
         default:
+          throw new HttpErrors[400]("This notification type is not supported.");
           break;
       }
     }
-
     throw new HttpErrors[400]("User not found");
-
   }
 
+
+  @post('/change-password', {
+    responses: {
+      '200': {
+        description: 'Login for users'
+      }
+    }
+  })
+  async changePassword(
+    @requestBody() changePasswordData: ChangePasswordData
+  ): Promise<Boolean> {
+    let user = await this.auth.VerifyUserToChangePassword(changePasswordData.id, changePasswordData.clave_actual);
+    if (user) {
+      return await this.auth.ChangePassword(changePasswordData.id, changePasswordData.clave_nueva);
+    }
+    throw new HttpErrors[400]("User not found");
+  }
 
 
 }

@@ -19,9 +19,8 @@ export class Administrador extends Entity {
 
   @property({
     type: 'string',
-    required: true,
   })
-  clave: string;
+  clave?: string;
 
   @property({
     type: 'string',

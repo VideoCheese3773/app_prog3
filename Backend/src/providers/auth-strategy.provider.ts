@@ -34,6 +34,8 @@ export class MyAuthStrategyProvider implements Provider<Strategy | undefined> {
     switch (name) {
       case 'BasicStrategy':
         return new BasicStrategy(this.VerifyUser.bind(this));
+      case 'TokenusuarioStrategy':
+        return new BearerStrategy(this.VerifyusuarioToken.bind(this));
       case 'TokenAdminFirstStrategy':
         return new BearerStrategy(this.VerifyAdminTokenFirst.bind(this));
       case 'TokenAdminSecondStrategy':
@@ -55,12 +57,24 @@ export class MyAuthStrategyProvider implements Provider<Strategy | undefined> {
     return cb(null, user);
   }
 
+  VerifyusuarioToken(
+    token: string,
+    cb: (err: Error | null, user?: object | false) => void,
+  ) {
+    this.authService.VerifyToken(token).then(data => {
+      if (data && data.role >= 0) {
+        return cb(null, data);
+      }
+      return cb(null, false);
+    });
+  }
+
   VerifyAdminTokenFirst(
     token: string,
     cb: (err: Error | null, user?: object | false) => void,
   ) {
     this.authService.VerifyToken(token).then(data => {
-      if (data && data.role == 1) {
+      if (data && data.role >= 1) {
         return cb(null, data);
       }
       return cb(null, false);
@@ -72,7 +86,7 @@ export class MyAuthStrategyProvider implements Provider<Strategy | undefined> {
     cb: (err: Error | null, user?: object | false) => void,
   ) {
     this.authService.VerifyToken(token).then(data => {
-      if (data && data.role == 2) {
+      if (data && data.role >= 2) {
         return cb(null, data);
       }
       return cb(null, false);
