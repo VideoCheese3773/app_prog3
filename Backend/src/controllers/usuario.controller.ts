@@ -66,6 +66,7 @@ export class UsuarioController {
   async login(
     @requestBody() credentials: Credentials
   ): Promise<object> {
+    console.log(`Username: ${credentials.nombre_usuario} - Password: ${credentials.clave}`);
     let usuario = await this.auth.Identify(credentials.nombre_usuario, credentials.clave);
     if (usuario) {
       let tk = await this.auth.GenerateToken(usuario);
@@ -268,14 +269,12 @@ export class UsuarioController {
       switch (passwordResetData.tipo) {
         case 1:
           if (usuario) {
-            console.log("a");
             let notification = new SmsNotification({
               body: `Su nueva contraseña es: ${randomPassword}`,
               to: usuario.celular
             });
             let sms = await new NotificationService().SmsNotification(notification);
             if (sms) {
-              console.log("sms message sent");
               return true
             }
             throw new HttpErrors[400]("Phone is not found");
@@ -294,7 +293,6 @@ export class UsuarioController {
             });
             let mail = await new NotificationService().MailNotification(notification);
             if (mail) {
-              console.log("mail message sent");
               return true
             }
             throw new HttpErrors[400]("Email is not found");

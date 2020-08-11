@@ -26,3 +26,5 @@ export * from './denuncia.controller';
 export * from './comentario.controller';
 export * from './imagen-publicacion.controller';
 export * from './carga.controller';
+export * from './administrador-denuncia.controller';
+export * from './denuncia-administrador.controller';

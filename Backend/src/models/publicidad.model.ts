@@ -10,6 +10,14 @@ export class Publicidad extends Entity {
     generated: true,
   })
   id_publicidad?: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  nombre: string;
+
+
   @property({
     type: 'string',
     required: true,

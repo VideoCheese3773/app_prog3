@@ -1,7 +1,7 @@
-import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {belongsTo, Entity, model, property} from '@loopback/repository';
+import {Imagen} from './imagen.model';
 import {Publicacion} from './publicacion.model';
 import {Usuario} from './usuario.model';
-import {Imagen} from './imagen.model';
 
 @model({settings: {strict: false}})
 export class Comentario extends Entity {
@@ -36,10 +36,6 @@ export class Comentario extends Entity {
   })
   fecha: string;
 
-  @property({
-    type: 'string',
-  })
-  id_usuario?: string;
 
   @belongsTo(() => Publicacion)
   publicacionId: string;

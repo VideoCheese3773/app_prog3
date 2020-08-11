@@ -1,8 +1,8 @@
-import {Entity, model, property, belongsTo, hasMany} from '@loopback/repository';
-import {Usuario} from './usuario.model';
-import {Muro} from './muro.model';
-import {Denuncia} from './denuncia.model';
+import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
 import {Comentario} from './comentario.model';
+import {Denuncia} from './denuncia.model';
+import {Muro} from './muro.model';
+import {Usuario} from './usuario.model';
 
 @model({settings: {strict: false}})
 export class Publicacion extends Entity {
@@ -32,13 +32,13 @@ export class Publicacion extends Entity {
   no_gusta: number;
 
   @property({
-    type: 'boolean',
+    type: 'number',
     required: true,
   })
-  compartido: boolean;
+  compartido: number;
 
   @property({
-    type: 'date',
+    type: 'string',
     required: true,
   })
   fecha: string;

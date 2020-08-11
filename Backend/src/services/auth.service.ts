@@ -30,6 +30,7 @@ export class AuthService {
    * @param password
    */
   async Identify(nombre_usuario: string, clave: string): Promise<Usuario | false> {
+    console.log(`Username: ${nombre_usuario} - Password: ${clave}`);
     let user = await this.UsuarioRepository.findOne({where: {nombre_usuario: nombre_usuario}});
     if (user) {
       let cryptPass = new EncryptDecrypt(keys.LOGIN_CRYPT_METHOD).Encrypt(clave);
