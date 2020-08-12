@@ -29,6 +29,25 @@ export class Administrador extends Entity {
   })
   correo: string;
 
+  @property({
+    type: 'string',
+    required: true,
+  })
+  cargo: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  empresa: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  celular: string;
+
+
   @hasMany(() => Publicidad, {keyTo: 'id_administrador'})
   publicidades: Publicidad[];
 
