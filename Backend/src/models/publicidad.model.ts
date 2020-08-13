@@ -25,7 +25,7 @@ export class Publicidad extends Entity {
   contenido: string;
 
   @property({
-    type: 'date',
+    type: 'string',
     required: true,
   })
   fecha: string;

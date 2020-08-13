@@ -31,16 +31,16 @@ export class Comentario extends Entity {
   no_gusta: number;
 
   @property({
-    type: 'date',
+    type: 'string',
     required: true,
   })
   fecha: string;
 
 
-  @belongsTo(() => Publicacion)
+  @belongsTo(() => Publicacion, {name: 'publicacion'})
   publicacionId: string;
 
-  @belongsTo(() => Usuario)
+  @belongsTo(() => Usuario, {name: 'usuario'})
   usuarioId: string;
 
   @belongsTo(() => Imagen)

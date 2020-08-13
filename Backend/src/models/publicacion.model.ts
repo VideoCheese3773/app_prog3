@@ -20,6 +20,11 @@ export class Publicacion extends Entity {
   texto: string;
 
   @property({
+    type: 'string',
+  })
+  imagen?: string;
+
+  @property({
     type: 'number',
     required: true,
   })
@@ -43,7 +48,13 @@ export class Publicacion extends Entity {
   })
   fecha: string;
 
-  @belongsTo(() => Usuario)
+  @property({
+    type: 'string',
+    required: true,
+  })
+  nombre: string;
+
+  @belongsTo(() => Usuario, {name: 'usuario'})
   usuarioId: string;
 
   @belongsTo(() => Muro)

@@ -31,21 +31,18 @@ export class Administrador extends Entity {
 
   @property({
     type: 'string',
-    required: true,
   })
-  cargo: string;
+  cargo?: string;
 
   @property({
     type: 'string',
-    required: true,
   })
-  empresa: string;
+  empresa?: string;
 
   @property({
     type: 'string',
-    required: true,
   })
-  celular: string;
+  celular?: string;
 
 
   @hasMany(() => Publicidad, {keyTo: 'id_administrador'})

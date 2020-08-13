@@ -91,7 +91,7 @@ export class Usuario extends Entity {
   @hasMany(() => Comentario, {keyTo: 'id_usuario'})
   comentarios: Comentario[];
 
-  @belongsTo(() => Administrador, {name: 'administradores'})
+  @belongsTo(() => Administrador, {name: 'administrador'})
   administradorId: string;
 
   @belongsTo(() => Muro)

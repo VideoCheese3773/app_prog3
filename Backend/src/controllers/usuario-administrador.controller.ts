@@ -1,22 +1,16 @@
+import {repository} from '@loopback/repository';
 import {
-  repository,
-} from '@loopback/repository';
-import {
-  param,
   get,
-  getModelSchemaRef,
+  getModelSchemaRef, param
 } from '@loopback/rest';
-import {
-  Usuario,
-  Administrador,
-} from '../models';
+import {Administrador, Usuario} from '../models';
 import {UsuarioRepository} from '../repositories';
 
 export class UsuarioAdministradorController {
   constructor(
     @repository(UsuarioRepository)
     public usuarioRepository: UsuarioRepository,
-  ) { }
+  ) {}
 
   @get('/usuarios/{id}/administrador', {
     responses: {
@@ -33,6 +27,6 @@ export class UsuarioAdministradorController {
   async getAdministrador(
     @param.path.string('id') id: typeof Usuario.prototype.id_usuario,
   ): Promise<Administrador> {
-    return this.usuarioRepository.administradores(id);
+    return this.usuarioRepository.administrador(id);
   }
 }

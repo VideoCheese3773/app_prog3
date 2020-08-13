@@ -1,6 +1,6 @@
-import {Entity, model, property, belongsTo} from '@loopback/repository';
-import {Publicacion} from './publicacion.model';
+import {belongsTo, Entity, model, property} from '@loopback/repository';
 import {Administrador} from './administrador.model';
+import {Publicacion} from './publicacion.model';
 
 @model({settings: {strict: false}})
 export class Denuncia extends Entity {
@@ -24,15 +24,21 @@ export class Denuncia extends Entity {
   descripcion: string;
 
   @property({
-    type: 'date',
+    type: 'string',
     required: true,
   })
   fecha: string;
 
-  @belongsTo(() => Publicacion)
+  @property({
+    type: 'string',
+    required: true,
+  })
+  resuelto?: string;
+
+  @belongsTo(() => Publicacion, {name: 'publicacion'})
   publicacionId: string;
 
-  @belongsTo(() => Administrador)
+  @belongsTo(() => Administrador, {name: 'administrador'})
   administradorId: string;
   // Define well-known properties here
 

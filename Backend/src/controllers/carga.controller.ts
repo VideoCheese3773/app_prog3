@@ -10,8 +10,8 @@ import {
 import multer from 'multer';
 import path from 'path';
 import {UploadFilesKeys} from '../keys/upload-file-keys';
-import {Imagen, Publicacion, Usuario} from '../models';
-import {ImagenRepository, PublicidadRepository, UsuarioRepository} from '../repositories';
+import {Publicacion, Publicidad, Usuario} from '../models';
+import {DenunciaRepository, PublicacionRepository, PublicidadRepository, UsuarioRepository} from '../repositories';
 
 
 /**
@@ -19,28 +19,20 @@ import {ImagenRepository, PublicidadRepository, UsuarioRepository} from '../repo
  */
 export class FileUploadController {
 
-  /**
-   *
-   * @param UsuarioRepository
-   * @param ImagenRepository
-   * @param PublicidadRepository
-   */
+
   constructor(
+    @repository(DenunciaRepository)
+    private DenunciaRepository: DenunciaRepository,
     @repository(UsuarioRepository)
     private UsuarioRepository: UsuarioRepository,
-    @repository(ImagenRepository)
-    private ImagenRepository: ImagenRepository,
+    @repository(PublicacionRepository)
+    private PublicacionRepository: PublicacionRepository,
     @repository(PublicidadRepository)
     private PublicidadRepository: PublicidadRepository,
   ) {}
 
-  /**
-   * Add or replace the profile photo of a Usuario by UsuarioId
-   * @param request
-   * @param UsuarioId
-   * @param response
-   */
-  @post('/UsuarioProfilePhoto', {
+
+  @post('/foto-perfil', {
     responses: {
       200: {
         content: {
@@ -56,7 +48,7 @@ export class FileUploadController {
   })
   async UsuarioPhotoUpload(
     @inject(RestBindings.Http.RESPONSE) response: Response,
-    @param.query.string('UsuarioId') UsuarioId: string,
+    @param.query.string('id_usuario') id_usuario: string,
     @requestBody.file() request: Request,
   ): Promise<object | false> {
     const UsuarioPhotoPath = path.join(__dirname, UploadFilesKeys.USUARIO_PROFILE_PHOTO_PATH);
@@ -64,10 +56,10 @@ export class FileUploadController {
     if (res) {
       const filename = response.req?.file.filename;
       if (filename) {
-        let c: Usuario = await this.UsuarioRepository.findById(UsuarioId);
+        let c: Usuario = await this.UsuarioRepository.findById(id_usuario);
         if (c) {
           c.foto = filename;
-          this.UsuarioRepository.replaceById(UsuarioId, c);
+          this.UsuarioRepository.replaceById(id_usuario, c);
           return {filename: filename};
         }
       }
@@ -75,12 +67,37 @@ export class FileUploadController {
     return res;
   }
 
-  /**
-   *
-   * @param response
-   * @param PublicidadId
-   * @param request
-   */
+  @post('/archivodenuncia', {
+    responses: {
+      200: {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+            },
+          },
+        },
+        description: ' foto denuncia',
+      },
+    },
+  })
+  async DenunuciaPhotoUpload(
+    @inject(RestBindings.Http.RESPONSE) response: Response,
+    @param.query.string('id_denuncia') id_denuncia: string,
+    @requestBody.file() request: Request,
+  ): Promise<object | false> {
+    const DenunciaPhotoPath = path.join(__dirname, UploadFilesKeys.DENUNCIA_IMAGE_PATH);
+    let res = await this.StoreFileToPath(DenunciaPhotoPath, UploadFilesKeys.DENUNCIA_IMAGE_FIELDNAME, request, response, UploadFilesKeys.IMAGE_ACCEPTED_EXT);
+    if (res) {
+      const filename = response.req?.file.filename;
+      if (filename) {
+        return {filename: filename};
+      }
+    }
+    return res;
+  }
+
+
   @post('/PublicidadImagen', {
     responses: {
       200: {
@@ -97,26 +114,26 @@ export class FileUploadController {
   })
   async PublicidadImagenUpload(
     @inject(RestBindings.Http.RESPONSE) response: Response,
+    @param.query.string('id_publicidad') id_publicidad: string,
     @requestBody.file() request: Request,
   ): Promise<object | false> {
     const PublicidadImagenPath = path.join(__dirname, UploadFilesKeys.PUBLICIDAD_IMAGE_PATH);
-    let res = await this.StoreFileToPath(PublicidadImagenPath, UploadFilesKeys.USUARIO_PROFILE_PHOTO_FIELDNAME, request, response, UploadFilesKeys.IMAGE_ACCEPTED_EXT);
+    let res = await this.StoreFileToPath(PublicidadImagenPath, UploadFilesKeys.PUBLICACION_IMAGE_FIELDNAME, request, response, UploadFilesKeys.IMAGE_ACCEPTED_EXT);
     if (res) {
       const filename = response.req?.file.filename;
       if (filename) {
-        return {filename: filename};
+        let c: Publicidad = await this.PublicidadRepository.findById(id_publicidad);
+        if (c) {
+          c.contenido = filename;
+          this.PublicidadRepository.replaceById(id_publicidad, c);
+          return {filename: filename};
+        }
       }
     }
     return res;
   }
 
-  /**
-   * Add a new Imagen or replace another one that exists of a Publicacion
-   * @param request
-   * @param response
-   * @param PublicacionId
-   * @param ImagenId if this parameter is empty then the Imagens will be added, on the contrary it will be replaced
-   */
+
   @post('/PublicacionImagen', {
     responses: {
       200: {
@@ -130,9 +147,7 @@ export class FileUploadController {
   })
   async PublicacionImagenUpload(
     @inject(RestBindings.Http.RESPONSE) response: Response,
-    @param.query.string('PublicacionId') PublicacionId: typeof Publicacion.prototype.id_publicacion,
-    @param.query.number('order') order: number,
-    @param.query.string('ImagenId') ImagenId: typeof Imagen.prototype.id_imagen,
+    @param.query.string('id_publicacion') id_publicacion: typeof Publicacion.prototype.id_publicacion,
     @requestBody.file() request: Request,
   ): Promise<object | false> {
     const PublicacionPath = path.join(__dirname, UploadFilesKeys.PUBLICACION_IMAGE_PATH);
@@ -140,21 +155,12 @@ export class FileUploadController {
     if (res) {
       const filename = response.req?.file.filename;
       if (filename) {
-        let img: Imagen;
-        if (ImagenId) {
-          img = await this.ImagenRepository.findById(ImagenId);
-          img.ruta = filename;
-          img.order = order;
-          await this.ImagenRepository.replaceById(ImagenId, img);
-        } else {
-          img = new Imagen({
-            ruta: filename,
-            order: order,
-            id_publicacion: PublicacionId ?? ''
-          });
-          await this.ImagenRepository.create(img);
+        let c: Publicacion = await this.PublicacionRepository.findById(id_publicacion);
+        if (c) {
+          c.imagen = filename;
+          this.PublicacionRepository.replaceById(id_publicacion, c);
+          return {filename: filename};
         }
-        return {filename: filename};
       }
     }
     return res;
